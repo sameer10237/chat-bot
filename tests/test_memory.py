@@ -1,7 +1,8 @@
 import pytest
 
 from src.chatbot import ChatMessage
-from src.context import estimate_tokens, trim_history
+from src.context import calculate_history_budget, estimate_tokens, trim_history
+from src.errors import ChatbotError
 from src.memory import ConversationMemory
 
 
@@ -49,6 +50,22 @@ def test_history_trimming_discards_oldest_messages_first():
     assert trim_history(history, 6) == (history[-1],)
 
 
+def test_history_trimming_preserves_complete_turns():
+    history = (
+        ChatMessage(role="user", content="old"),
+        ChatMessage(role="assistant", content="reply"),
+        ChatMessage(role="user", content="new"),
+        ChatMessage(role="assistant", content="answer"),
+    )
+
+    assert trim_history(history, 12) == history[-2:]
+
+
 def test_history_trimming_rejects_negative_budget():
     with pytest.raises(ValueError, match="max_tokens must not be negative"):
         trim_history((), -1)
+
+
+def test_context_budget_rejects_prompt_larger_than_window():
+    with pytest.raises(ChatbotError, match="exceed the configured context window"):
+        calculate_history_budget("system", "question", 1)
