@@ -9,6 +9,7 @@ def test_config_reads_environment(monkeypatch):
         env.setenv("SYSTEM_PROMPT", "Be concise.")
         env.setenv("HOST", "0.0.0.0")
         env.setenv("PORT", "8123")
+        env.setenv("MAX_CONTEXT_TOKENS", "4096")
         env.setenv("NVIDIA_API_KEY", "test-key")
         env.setenv("NVIDIA_MODEL", "test/model")
         env.setenv("NVIDIA_BASE_URL", "https://example.test/v1/")
@@ -19,6 +20,7 @@ def test_config_reads_environment(monkeypatch):
         assert config.SYSTEM_PROMPT == "Be concise."
         assert config.HOST == "0.0.0.0"
         assert config.PORT == 8123
+        assert config.MAX_CONTEXT_TOKENS == 4096
         assert config.NVIDIA_API_KEY == "test-key"
         assert config.NVIDIA_MODEL == "test/model"
         assert config.NVIDIA_BASE_URL == "https://example.test/v1"
