@@ -12,17 +12,21 @@ class NvidiaClient:
         api_key: str = config.NVIDIA_API_KEY,
         base_url: str = config.NVIDIA_BASE_URL,
         model: str = config.NVIDIA_MODEL,
+        transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
         self.api_key = api_key
         self.base_url = base_url.rstrip("/")
         self.model = model
+        self.transport = transport
 
     async def generate(self, messages: Sequence[dict[str, str]]) -> str:
         if not self.api_key:
             raise ChatbotError("The language model API key is not configured.", 503)
 
         try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
+            async with httpx.AsyncClient(
+                timeout=60.0, transport=self.transport
+            ) as client:
                 response = await client.post(
                     f"{self.base_url}/chat/completions",
                     headers={"Authorization": f"Bearer {self.api_key}"},
