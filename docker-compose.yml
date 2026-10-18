@@ -1,0 +1,26 @@
+services:
+  index:
+    build: .
+    env_file: .env
+    command: ["python", "-m", "src.index_knowledge"]
+    volumes:
+      - chatbot-data:/app/var
+    restart: "no"
+
+  api:
+    build: .
+    env_file: .env
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8000
+    depends_on:
+      index:
+        condition: service_completed_successfully
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      - chatbot-data:/app/var
+    restart: unless-stopped
+
+volumes:
+  chatbot-data:
