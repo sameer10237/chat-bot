@@ -1,7 +1,8 @@
 import asyncio
 from collections.abc import Callable
 
-from .chatbot import Chatbot, ChatMessage
+from .chatbot import Chatbot
+from .memory import ConversationMemory
 
 
 async def run_cli(
@@ -9,7 +10,7 @@ async def run_cli(
     input_fn: Callable[[str], str] = input,
     output_fn: Callable[[str], None] = print,
 ) -> None:
-    history: list[ChatMessage] = []
+    memory = ConversationMemory()
     output_fn("Chatbot ready. Type 'quit' or 'exit' to stop.")
 
     while True:
@@ -24,14 +25,9 @@ async def run_cli(
         if not message:
             continue
 
-        reply = await chatbot.respond(message, history)
+        reply = await chatbot.respond(message, memory.messages)
         output_fn(f"Assistant: {reply}")
-        history.extend(
-            (
-                ChatMessage(role="user", content=message),
-                ChatMessage(role="assistant", content=reply),
-            )
-        )
+        memory.add_exchange(message, reply)
 
 
 def main(chatbot: Chatbot) -> None:

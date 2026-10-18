@@ -54,6 +54,18 @@ def test_generate_rejects_malformed_provider_response():
     assert error.value.status_code == 502
 
 
+def test_generate_rejects_non_json_provider_response():
+    client = NvidiaClient(
+        api_key="test-key",
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(200, text="not-json")
+        ),
+    )
+
+    with pytest.raises(ChatbotError, match="invalid response"):
+        asyncio.run(client.generate([]))
+
+
 def test_generate_maps_provider_http_errors():
     client = NvidiaClient(
         api_key="test-key",

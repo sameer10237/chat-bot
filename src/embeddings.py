@@ -43,7 +43,7 @@ class NvidiaEmbeddingClient:
 
         try:
             vector = response.json()["data"][0]["embedding"]
-        except (KeyError, IndexError, TypeError) as exc:
+        except (KeyError, IndexError, TypeError, ValueError) as exc:
             raise ChatbotError(
                 "The embedding service returned invalid data.", 502
             ) from exc

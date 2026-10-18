@@ -40,7 +40,7 @@ class NvidiaClient:
 
         try:
             reply = response.json()["choices"][0]["message"]["content"]
-        except (KeyError, IndexError, TypeError) as exc:
+        except (KeyError, IndexError, TypeError, ValueError) as exc:
             raise ChatbotError(
                 "The language model returned an invalid response.", 502
             ) from exc
