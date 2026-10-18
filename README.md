@@ -2,6 +2,84 @@
 
 A specialized Python scraper designed to harvest, clean, and structure institutional data from [Shree Devi Institute of Technology (SDIT)](https://sdit.ac.in/) into clean JSON formats for AI chatbots, Retrieval-Augmented Generation (RAG) vector stores, and FAQ systems.
 
+## Run the Chatbot Application
+
+The repository also contains a FastAPI chatbot with a browser UI, NVIDIA
+chat-completion and embedding clients, and a local SQLite vector index. Use
+Python 3.11 or newer.
+
+### Local setup
+
+From the repository root, create an environment file and add an NVIDIA API key:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Edit `.env` and replace `your_nvidia_api_key_here` with a key from
+[NVIDIA Build](https://build.nvidia.com/). Install the development dependencies
+(including test and lint tools):
+
+```powershell
+python -m pip install -r requirements-dev.txt
+```
+
+Build or refresh the local vector index, then start the API:
+
+```powershell
+python -m src.index_knowledge
+python -m uvicorn src.main:app --host 127.0.0.1 --port 8000
+```
+
+Open <http://127.0.0.1:8000/> for the chat UI. The interactive API schema is at
+<http://127.0.0.1:8000/docs>, and `GET /health` reports the selected model.
+The vector index is stored in `var/vector_store.sqlite3` and is excluded from
+Git. Re-run the indexing command after changing the knowledge chunks or
+embedding model.
+
+### Chat API
+
+Send a user message and optional conversation history to `POST /api/chat`:
+
+```powershell
+curl.exe -X POST http://127.0.0.1:8000/api/chat `
+  -H "Content-Type: application/json" `
+  -d "{\"message\":\"What programs are offered?\",\"history\":[]}"
+```
+
+Successful responses contain a generated `reply` and a `sources` array with
+document IDs and available title, URL, category, and heading metadata. Invalid
+or blank messages return HTTP 422; missing provider configuration or upstream
+provider failures return structured error responses.
+
+`MAX_CONTEXT_TOKENS` controls the approximate context budget, and
+`MIN_RETRIEVAL_SCORE` sets the cosine-similarity threshold for RAG results.
+Token counts are estimates rather than model-specific tokenizer counts.
+Conversation history is sent by the client and is not persisted between
+sessions.
+
+### Docker Compose
+
+After creating `.env` as described above, build the image, index the knowledge
+base, and start the API:
+
+```powershell
+docker compose up --build
+```
+
+The Compose stack runs indexing before the API and persists the SQLite index in
+a named volume. Set `PORT` in `.env` to change the host port.
+
+### Development checks
+
+Run the unit and API integration tests and check lint/formatting with:
+
+```powershell
+python -m pytest tests -q
+python -m ruff check src tests
+python -m ruff format --check src tests
+```
+
 ---
 
 ## 🚀 Quick Start
