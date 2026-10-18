@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from .prompts import DEFAULT_SYSTEM_PROMPT
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DATA_DIR = PROJECT_ROOT / "data"
 load_dotenv(PROJECT_ROOT / ".env")
 
 APP_NAME = os.getenv("APP_NAME", "Chatbot API").strip()
@@ -22,3 +23,4 @@ NVIDIA_BASE_URL = os.getenv(
     "NVIDIA_BASE_URL",
     "https://integrate.api.nvidia.com/v1",
 ).rstrip("/")
+CHUNKS_PATH = DATA_DIR / "sdit_chatbot_chunks.json"
