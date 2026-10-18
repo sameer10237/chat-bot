@@ -1,3 +1,9 @@
+[project]
+name = "sdit-campus-chatbot"
+version = "1.0.0"
+description = "A campus assistant with FastAPI and retrieval-augmented generation"
+requires-python = ">=3.11"
+
 [tool.ruff]
 line-length = 88
 target-version = "py313"

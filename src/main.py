@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import RequestResponseEndpoint
 
+from . import __version__
 from .api_models import ChatRequest, ChatResponse, SourceResponse
 from .chatbot import ChatMessage
 from .config import APP_NAME, CORS_ORIGINS, NVIDIA_MODEL
@@ -36,7 +37,7 @@ async def lifespan(application: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(
     title=APP_NAME,
     description="API for the chatbot application.",
-    version="0.1.0",
+    version=__version__,
     lifespan=lifespan,
 )
 app.add_middleware(
