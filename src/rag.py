@@ -3,11 +3,10 @@ from dataclasses import dataclass
 
 from . import config
 from .chatbot import Chatbot, ChatMessage
-from .context import calculate_history_budget, trim_history
 from .documents import Document, load_documents
 from .embeddings import NvidiaEmbeddingClient
+from .llm_chatbot import LLMChatbot
 from .llm_client import NvidiaClient
-from .message_format import format_chat_messages
 from .validation import validate_user_message
 from .vector_store import SearchResult, SQLiteVectorStore
 
@@ -57,8 +56,9 @@ class RAGChatbot(Chatbot):
         system_prompt: str = config.SYSTEM_PROMPT,
     ) -> None:
         self.engine = engine
-        self.client = client or NvidiaClient()
-        self.system_prompt = system_prompt
+        self.llm = LLMChatbot(
+            client=client or NvidiaClient(), system_prompt=system_prompt
+        )
 
     async def respond(
         self,
@@ -75,22 +75,15 @@ class RAGChatbot(Chatbot):
         user_message = validate_user_message(message)
         results = await self.engine.retrieve(user_message)
         context = self._format_context(results)
-        system_prompt = self.system_prompt
+        system_prompt = self.llm.system_prompt
         if context:
             system_prompt = f"{system_prompt}\n\nKnowledge base context:\n{context}"
 
-        history_budget = calculate_history_budget(
-            system_prompt,
+        reply = await self.llm.respond_with_prompt(
             user_message,
-            config.MAX_CONTEXT_TOKENS,
-        )
-        recent_history = trim_history(history, history_budget)
-        messages = format_chat_messages(
+            history,
             system_prompt,
-            recent_history,
-            user_message,
         )
-        reply = await self.client.generate(messages)
         return RAGAnswer(
             reply=reply,
             sources=tuple(result.document for result in results),
