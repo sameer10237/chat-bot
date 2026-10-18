@@ -19,6 +19,10 @@ if MAX_CONTEXT_TOKENS < 1:
 
 NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "").strip()
 NVIDIA_MODEL = os.getenv("NVIDIA_MODEL", "meta/llama-3.3-70b-instruct").strip()
+NVIDIA_EMBEDDING_MODEL = os.getenv(
+    "NVIDIA_EMBEDDING_MODEL",
+    "nvidia/nv-embedqa-e5-v5",
+).strip()
 NVIDIA_BASE_URL = os.getenv(
     "NVIDIA_BASE_URL",
     "https://integrate.api.nvidia.com/v1",
