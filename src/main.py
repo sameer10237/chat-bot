@@ -1,8 +1,11 @@
 import logging
 
 from fastapi import FastAPI
+from fastapi.requests import Request
+from fastapi.responses import JSONResponse
 
 from .config import APP_NAME
+from .errors import ChatbotError
 from .logging_config import configure_logging
 
 configure_logging()
@@ -13,3 +16,12 @@ app = FastAPI(
     description="API for the chatbot application.",
     version="0.1.0",
 )
+
+
+@app.exception_handler(ChatbotError)
+async def handle_chatbot_error(request: Request, exc: ChatbotError) -> JSONResponse:
+    logger.error("Chatbot request failed at %s: %s", request.url.path, exc.message)
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error": {"message": exc.message}},
+    )
