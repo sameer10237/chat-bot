@@ -1,10 +1,12 @@
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import RequestResponseEndpoint
 
 from .api_models import ChatRequest, ChatResponse, SourceResponse
@@ -18,6 +20,7 @@ from .validation import validate_user_message
 
 configure_logging()
 logger = logging.getLogger(__name__)
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 
 
 @asynccontextmanager
@@ -42,6 +45,7 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type", "Authorization"],
 )
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 @app.middleware("http")
@@ -57,6 +61,11 @@ async def add_security_headers(
         "default-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'"
     )
     return response
+
+
+@app.get("/", include_in_schema=False)
+async def serve_chat() -> FileResponse:
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 @app.get("/health")
