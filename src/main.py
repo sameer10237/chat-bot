@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 
-from .config import APP_NAME
+from .config import APP_NAME, NVIDIA_MODEL
 from .errors import ChatbotError
 from .logging_config import configure_logging
 
@@ -16,6 +16,11 @@ app = FastAPI(
     description="API for the chatbot application.",
     version="0.1.0",
 )
+
+
+@app.get("/health")
+async def health_check() -> dict[str, str]:
+    return {"status": "ok", "model": NVIDIA_MODEL}
 
 
 @app.exception_handler(ChatbotError)
