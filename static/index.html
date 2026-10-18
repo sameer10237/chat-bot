@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Ask questions and get answers from the campus knowledge base.">
+    <title>Chatbot</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <main class="chat-shell">
+      <header>
+        <p class="eyebrow">Campus assistant</p>
+        <h1>How can I help?</h1>
+        <p class="intro">Ask a question about campus, academics, or admissions.</p>
+      </header>
+      <section id="conversation" class="conversation" aria-live="polite" aria-label="Conversation">
+        <p class="welcome">Your conversation will appear here.</p>
+      </section>
+      <p id="error" class="error" role="alert" hidden></p>
+      <form id="chat-form">
+        <label class="visually-hidden" for="message">Your message</label>
+        <textarea id="message" name="message" rows="2" maxlength="1200" required
+          placeholder="Type your question..." autocomplete="off"></textarea>
+        <button id="send" type="submit">Send</button>
+      </form>
+      <p class="privacy-note">Please do not include sensitive personal information.</p>
+    </main>
+  </body>
+</html>
