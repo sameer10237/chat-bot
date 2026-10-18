@@ -179,3 +179,16 @@ documents = [
 # Add to your vector store (e.g. Chroma, FAISS, Pinecone)
 # vector_store = Chroma.from_documents(documents, embedding_model)
 ```
+
+## Chatbot Conversation Memory
+
+The application keeps conversation history as ordered user/assistant message
+pairs. `ConversationMemory` provides a bounded in-memory buffer, and the LLM
+controller trims older complete exchanges before building a provider request.
+The default context budget is 6,000 estimated tokens and can be changed with
+`MAX_CONTEXT_TOKENS`.
+
+Token counts are estimates based on UTF-8 byte length, not a provider-specific
+tokenizer. A request is rejected if its system prompt and current message alone
+exceed the configured budget. Conversation buffers are process-local and are
+not persisted between sessions or application restarts.
