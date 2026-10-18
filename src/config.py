@@ -16,6 +16,9 @@ PORT = int(os.getenv("PORT", "8000"))
 MAX_CONTEXT_TOKENS = int(os.getenv("MAX_CONTEXT_TOKENS", "6000"))
 if MAX_CONTEXT_TOKENS < 1:
     raise ValueError("MAX_CONTEXT_TOKENS must be positive")
+MIN_RETRIEVAL_SCORE = float(os.getenv("MIN_RETRIEVAL_SCORE", "0.25"))
+if not -1 <= MIN_RETRIEVAL_SCORE <= 1:
+    raise ValueError("MIN_RETRIEVAL_SCORE must be between -1 and 1")
 
 NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "").strip()
 NVIDIA_MODEL = os.getenv("NVIDIA_MODEL", "meta/llama-3.3-70b-instruct").strip()

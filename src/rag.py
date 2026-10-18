@@ -23,9 +23,13 @@ class RAGEngine:
         self,
         embedding_client: NvidiaEmbeddingClient,
         vector_store: SQLiteVectorStore,
+        min_retrieval_score: float = config.MIN_RETRIEVAL_SCORE,
     ) -> None:
+        if not -1 <= min_retrieval_score <= 1:
+            raise ValueError("min_retrieval_score must be between -1 and 1")
         self.embedding_client = embedding_client
         self.vector_store = vector_store
+        self.min_retrieval_score = min_retrieval_score
 
     async def index_documents(self, documents: Sequence[Document]) -> None:
         for document in documents:
@@ -39,7 +43,10 @@ class RAGEngine:
 
     async def retrieve(self, query: str, limit: int = 4) -> list[SearchResult]:
         embedding = await self.embedding_client.embed(query)
-        return self.vector_store.search(embedding, limit=limit)
+        results = self.vector_store.search(embedding, limit=limit)
+        return [
+            result for result in results if result.score >= self.min_retrieval_score
+        ]
 
 
 class RAGChatbot(Chatbot):
