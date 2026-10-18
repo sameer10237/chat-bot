@@ -3,10 +3,13 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from .prompts import DEFAULT_SYSTEM_PROMPT
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(PROJECT_ROOT / ".env")
 
 APP_NAME = os.getenv("APP_NAME", "Chatbot API").strip()
+SYSTEM_PROMPT = os.getenv("SYSTEM_PROMPT", DEFAULT_SYSTEM_PROMPT).strip()
 HOST = os.getenv("HOST", "127.0.0.1").strip()
 PORT = int(os.getenv("PORT", "8000"))
 

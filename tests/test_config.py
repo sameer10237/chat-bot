@@ -6,6 +6,7 @@ def test_config_reads_environment(monkeypatch):
 
     with monkeypatch.context() as env:
         env.setenv("APP_NAME", "Test Assistant")
+        env.setenv("SYSTEM_PROMPT", "Be concise.")
         env.setenv("HOST", "0.0.0.0")
         env.setenv("PORT", "8123")
         env.setenv("NVIDIA_API_KEY", "test-key")
@@ -15,6 +16,7 @@ def test_config_reads_environment(monkeypatch):
         importlib.reload(config)
 
         assert config.APP_NAME == "Test Assistant"
+        assert config.SYSTEM_PROMPT == "Be concise."
         assert config.HOST == "0.0.0.0"
         assert config.PORT == 8123
         assert config.NVIDIA_API_KEY == "test-key"
