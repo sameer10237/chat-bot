@@ -1,11 +1,13 @@
 import logging
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, Response
+from starlette.middleware.base import RequestResponseEndpoint
 
 from .api_models import ChatRequest, ChatResponse, SourceResponse
 from .chatbot import ChatMessage
-from .config import APP_NAME, NVIDIA_MODEL
+from .config import APP_NAME, CORS_ORIGINS, NVIDIA_MODEL
 from .errors import ChatbotError
 from .logging_config import configure_logging
 from .rag import RAGChatbot
@@ -19,6 +21,27 @@ app = FastAPI(
     description="API for the chatbot application.",
     version="0.1.0",
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type", "Authorization"],
+)
+
+
+@app.middleware("http")
+async def add_security_headers(
+    request: Request,
+    call_next: RequestResponseEndpoint,
+) -> Response:
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'"
+    )
+    return response
 
 
 @app.get("/health")

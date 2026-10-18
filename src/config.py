@@ -13,6 +13,14 @@ APP_NAME = os.getenv("APP_NAME", "Chatbot API").strip()
 SYSTEM_PROMPT = os.getenv("SYSTEM_PROMPT", DEFAULT_SYSTEM_PROMPT).strip()
 HOST = os.getenv("HOST", "127.0.0.1").strip()
 PORT = int(os.getenv("PORT", "8000"))
+CORS_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ORIGINS",
+        "http://localhost:8000,http://127.0.0.1:8000",
+    ).split(",")
+    if origin.strip()
+]
 MAX_CONTEXT_TOKENS = int(os.getenv("MAX_CONTEXT_TOKENS", "6000"))
 if MAX_CONTEXT_TOKENS < 1:
     raise ValueError("MAX_CONTEXT_TOKENS must be positive")
