@@ -3,6 +3,7 @@ from collections.abc import Sequence
 from . import config
 from .chatbot import Chatbot, ChatMessage
 from .llm_client import NvidiaClient
+from .message_format import format_chat_messages
 from .validation import validate_user_message
 
 
@@ -21,9 +22,5 @@ class LLMChatbot(Chatbot):
         history: Sequence[ChatMessage] = (),
     ) -> str:
         user_message = validate_user_message(message)
-        messages = [{"role": "system", "content": self.system_prompt}]
-        messages.extend(
-            {"role": item.role, "content": item.content} for item in history
-        )
-        messages.append({"role": "user", "content": user_message})
+        messages = format_chat_messages(self.system_prompt, history, user_message)
         return await self.client.generate(messages)
