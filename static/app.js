@@ -49,7 +49,12 @@ function addMessage(role, content, sources = []) {
   }
 
   conversation.append(article);
-  conversation.scrollTop = conversation.scrollHeight;
+  conversation.scrollTo({
+    top: conversation.scrollHeight,
+    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "auto"
+      : "smooth",
+  });
 }
 
 form.addEventListener("submit", async (event) => {
