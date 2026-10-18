@@ -28,3 +28,4 @@ NVIDIA_BASE_URL = os.getenv(
     "https://integrate.api.nvidia.com/v1",
 ).rstrip("/")
 CHUNKS_PATH = DATA_DIR / "sdit_chatbot_chunks.json"
+VECTOR_DB_PATH = DATA_DIR / "vector_store.sqlite3"
