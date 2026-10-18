@@ -1,4 +1,6 @@
 import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,15 +13,28 @@ from .config import APP_NAME, CORS_ORIGINS, NVIDIA_MODEL
 from .errors import ChatbotError
 from .logging_config import configure_logging
 from .rag import RAGChatbot
+from .services import create_chatbot
 from .validation import validate_user_message
 
 configure_logging()
 logger = logging.getLogger(__name__)
 
+
+@asynccontextmanager
+async def lifespan(application: FastAPI) -> AsyncIterator[None]:
+    chatbot = create_chatbot()
+    application.state.chatbot = chatbot
+    try:
+        yield
+    finally:
+        chatbot.engine.vector_store.close()
+
+
 app = FastAPI(
     title=APP_NAME,
     description="API for the chatbot application.",
     version="0.1.0",
+    lifespan=lifespan,
 )
 app.add_middleware(
     CORSMiddleware,
